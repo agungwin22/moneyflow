@@ -1,4 +1,3 @@
-````markdown
 # 💰 MoneyFlow – Personal Accounting App
 
 **MoneyFlow** adalah aplikasi web pencatatan keuangan pribadi yang modern, ringan, dan responsif. Dibangun dengan HTML5, CSS vanilla (tanpa framework), dan JavaScript ES6 modular. Aplikasi ini membantu kamu memantau pemasukan dan pengeluaran dengan mudah, lengkap dengan fitur CRUD, ekspor/impor CSV, serta tampilan dark theme yang nyaman di mata.
@@ -172,4 +171,3 @@ Kontribusi sangat terbuka! Silakan fork repository ini, buat branch fitur, dan a
 ---
 
 ⭐ **Jangan lupa beri bintang jika proyek ini bermanfaat!**
-````
