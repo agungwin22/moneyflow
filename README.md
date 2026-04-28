@@ -56,30 +56,6 @@
 
 ---
 
-## 📁 Struktur Proyek
-
-moneyflow/
-│
-├── index.html # Halaman utama dashboard (CRUD transaksi)
-├── login.html # Halaman login sederhana
-│
-├── css/ # Stylesheet modular
-│ ├── variables.css # Variabel CSS (warna, font, spacing, dll)
-│ ├── components.css # Styling komponen UI (header, tabel, modal, dropdown)
-│ └── responsive.css # Media queries untuk mobile & tablet
-│
-├── js/ # JavaScript modular
-│ ├── app.js # Entry point, event handlers, inisialisasi
-│ ├── storage.js # Operasi localStorage (load, save, reset)
-│ ├── transaction.js # Logika CRUD & perhitungan saldo
-│ ├── ui.js # Render tabel, modal, form, update DOM
-│ ├── csv.js # Impor & ekspor file CSV
-│ └── utils.js # Fungsi helper (formatRupiah, formatDate, validasi)
-│
-└── README.md # Dokumentasi proyek (file ini)
-
----
-
 ## 🚀 Cara Menggunakan
 
 ### Prasyarat
