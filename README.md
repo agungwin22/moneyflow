@@ -92,7 +92,6 @@ moneyflow/
    ```bash
    git clone https://github.com/agungwin22/moneyflow.git
    cd moneyflow
-````
 
 2. **Jalankan dengan Live Server** (rekomendasi)
    - Jika pakai VS Code: instal ekstensi "Live Server", lalu klik kanan `index.html` → "Open with Live Server"
@@ -173,7 +172,4 @@ Kontribusi sangat terbuka! Silakan fork repository ini, buat branch fitur, dan a
 ---
 
 ⭐ **Jangan lupa beri bintang jika proyek ini bermanfaat!**
-
-```
-
-```
+````
