@@ -1,0 +1,125 @@
+/* ===== RESPONSIVE ===== */
+
+/* Mobile: < 640px */
+@media (max-width: 639px) {
+  .app-container {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .header {
+    padding: var(--space-4);
+  }
+
+  .header-title {
+    font-size: var(--text-2xl);
+  }
+
+  .header-title i {
+    font-size: 2rem;
+  }
+
+  .header-saldo-value {
+    font-size: var(--text-xl);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .header-left {
+    text-align: center;
+  }
+
+  .header-right {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .header-saldo {
+    margin-top: 0; /* hilangkan margin atas jika ada */
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .profile-icon {
+    font-size: 2rem; /* sedikit lebih kecil di mobile */
+  }
+
+  .dropdown-menu {
+    right: 0;
+    left: auto; /* pastikan tidak overflow ke kiri */
+    min-width: 140px;
+  }
+
+  .form-card {
+    padding: var(--space-4);
+  }
+
+  .form-grid {
+    gap: var(--space-3);
+  }
+
+  .btn {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    min-height: 44px;
+  }
+
+  .table {
+    font-size: var(--text-xs);
+    min-width: 600px; /* sedikit lebih kecil dari default agar tidak terlalu lebar */
+  }
+
+  .table th,
+  .table td {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-group {
+    justify-content: space-between;
+  }
+
+  .action-group .btn {
+    flex: 1;
+  }
+
+  .modal-content {
+    margin: var(--space-2);
+  }
+
+  .modal-header {
+    padding: var(--space-4);
+  }
+
+  .modal-body {
+    padding: var(--space-4);
+  }
+}
+
+/* Untuk tablet (640px - 1023px) penyesuaian minor */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .btn-full-mobile {
+    width: auto;
+  }
+
+  .header-right {
+    gap: var(--space-3);
+  }
+}
+
+/* Memastikan container tidak terlalu lebar di layar besar */
+@media (min-width: 1280px) {
+  .app-container {
+    padding: var(--space-6) var(--space-8);
+  }
+}

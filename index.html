@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>MoneyFlow – Personal Accounting</title>
+
+  <!-- Google Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (Free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- CSS Modular -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <div id="app" class="app-container">
+    
+    <!-- ========== HEADER + TOTAL SALDO + PROFIL ========== -->
+    <header class="header">
+      <div class="header-left">
+        <h1 class="header-title">
+          <i class="fas fa-wallet"></i> MoneyFlow
+        </h1>
+      </div>
+      <div class="header-right">
+        <div class="header-saldo">
+          <span class="header-saldo-label">Total Saldo</span>
+          <span id="total-saldo" class="header-saldo-value">Rp0</span>
+        </div>
+        <div class="profile-dropdown">
+          <button class="profile-icon" id="profile-btn">
+            <i class="fas fa-user-circle"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdown-menu">
+            <button class="dropdown-item" id="login-btn">Login</button>
+            <button class="dropdown-item" id="register-btn">Register</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========== FORM TAMBAH TRANSAKSI ========== -->
+    <div class="form-card">
+      <h2 class="form-title">
+        <i class="fas fa-plus-circle"></i> Tambah Transaksi
+      </h2>
+      <div id="form-tambah" class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Tanggal</label>
+          <input type="date" id="tanggal" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deskripsi</label>
+          <input type="text" id="deskripsi" placeholder="Bayar listrik..." required class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pemasukan (Rp)</label>
+          <input type="number" id="pemasukan" min="0" placeholder="0" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pengeluaran (Rp)</label>
+          <input type="number" id="pengeluaran" min="0" placeholder="0" class="form-input">
+        </div>
+        <div class="form-group">
+          <button type="button" id="btn-tambah" class="btn btn-primary btn-full">
+            <i class="fas fa-save"></i> Tambah
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TOMBOL GLOBAL: IMPORT/EXPORT/RESET ========== -->
+    <div class="action-bar">
+      <div class="action-group">
+        <button id="btn-import" class="btn btn-secondary">
+          <i class="fas fa-file-import"></i> Import CSV
+        </button>
+        <button id="btn-export" class="btn btn-secondary">
+          <i class="fas fa-file-export"></i> Export CSV
+        </button>
+        <button id="btn-reset" class="btn btn-secondary">
+          <i class="fas fa-undo-alt"></i> Reset Data
+        </button>
+      </div>
+      <!-- Hidden file input untuk import CSV -->
+      <input type="file" id="file-import" accept=".csv" class="hidden">
+    </div>
+
+    <!-- ========== TABEL TRANSAKSI ========== -->
+    <div class="table-card">
+      <h2 class="form-title" style="margin-bottom: 1rem;"> <!-- pakai style sementara, bisa ditambah class -->
+        <i class="fas fa-list-ul"></i> Daftar Transaksi
+      </h2>
+      <div class="table-wrapper overflow-x-auto"> <!-- overflow-x-auto tetap ada untuk scroll -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Deskripsi</th>
+              <th>Pemasukan</th>
+              <th>Pengeluaran</th>
+              <th>Saldo</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- diisi oleh javascript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL EDIT ========== -->
+  <div id="modal-edit" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-edit"></i> Edit Transaksi
+        </h3>
+        <button id="btn-close-modal" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-edit" class="modal-form">
+          <input type="hidden" id="edit-id">
+          <div class="form-group">
+            <label class="form-label">Tanggal</label>
+            <input type="date" id="edit-tanggal" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deskripsi</label>
+            <input type="text" id="edit-deskripsi" placeholder="Deskripsi" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pemasukan (Rp)</label>
+            <input type="number" id="edit-pemasukan" min="0" placeholder="0" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pengeluaran (Rp)</label>
+            <input type="number" id="edit-pengeluaran" min="0" placeholder="0" class="form-input">
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-edit" class="btn btn-secondary">Batal</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Simpan Perubahan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/utils.js"></script>
+  <script type="module" src="js/storage.js"></script>
+  <script type="module" src="js/transaction.js"></script>
+  <script type="module" src="js/ui.js"></script>
+  <script type="module" src="js/csv.js"></script>
+</body>
+</html>
