@@ -1,4 +1,4 @@
-```markdown
+````markdown
 # 💰 MoneyFlow – Personal Accounting App
 
 **MoneyFlow** adalah aplikasi web pencatatan keuangan pribadi yang modern, ringan, dan responsif. Dibangun dengan HTML5, CSS vanilla (tanpa framework), dan JavaScript ES6 modular. Aplikasi ini membantu kamu memantau pemasukan dan pengeluaran dengan mudah, lengkap dengan fitur CRUD, ekspor/impor CSV, serta tampilan dark theme yang nyaman di mata.
@@ -58,7 +58,6 @@
 ---
 
 ## 📁 Struktur Proyek
-```
 
 moneyflow/
 ├── index.html # Halaman utama dashboard
@@ -75,13 +74,12 @@ moneyflow/
 │ └── utils.js # Helper: formatRupiah, formatDate, validasi
 └── README.md
 
-````
-
 ---
 
 ## 🚀 Cara Menggunakan
 
 ### Prasyarat
+
 - Browser modern (Chrome, Firefox, Edge, Safari)
 - Koneksi internet untuk pertama kali (mengambil Font Awesome & Google Fonts)
 - **Live Server** atau web server lokal (karena menggunakan ES6 modules)
@@ -89,9 +87,11 @@ moneyflow/
 ### Langkah-langkah
 
 1. **Clone repository**
+
    ```bash
    git clone https://github.com/agungwin22/moneyflow.git
    cd moneyflow
+   ```
 
 2. **Jalankan dengan Live Server** (rekomendasi)
    - Jika pakai VS Code: instal ekstensi "Live Server", lalu klik kanan `index.html` → "Open with Live Server"
