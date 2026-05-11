@@ -148,11 +148,13 @@ body {
   color: var(--text-secondary);
   padding: var(--space-3) var(--space-4);
   text-align: left;
+  text-decoration: none;
   font-size: var(--text-sm);
   cursor: pointer;
   transition: background-color 0.2s;
   width: 100%;
   min-height: 44px; /* sentuh-friendly */
+  display: block;
 }
 
 .dropdown-item:hover {
@@ -543,6 +545,10 @@ body {
 
 .mt-3 {
   margin-top: var(--space-3);
+}
+
+.text-underline{
+  text-decoration: none;
 }
 
 /* Scrollbar styling */

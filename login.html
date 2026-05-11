@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="icon/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>MoneyFlow – Login</title>
+
+  <!-- Google Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- CSS Modular -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body style="background-color: var(--bg-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--space-4);">
+  <div class="form-card" style="max-width: 400px; width: 100%; margin: 0;">
+    <div style="text-align: center; margin-bottom: var(--space-6);">
+      <i class="fas fa-wallet" style="font-size: 3rem; color: var(--accent-blue);"></i>
+      <h1 class="header-title" style="justify-content: center; margin-top: var(--space-2);">MoneyFlow</h1>
+      <p style="color: var(--text-tertiary); margin-top: var(--space-2);">Masuk ke akun Anda</p>
+    </div>
+
+    <form id="loginForm" class="modal-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="email" class="form-input" placeholder="nama@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">
+        <i class="fas fa-sign-in-alt"></i> Masuk
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: var(--space-4);">
+      <span style="color: var(--text-tertiary);">Belum punya akun? </span>
+      <a href="register.html" style="color: var(--accent-blue); text-decoration: none; font-weight: 500;">Daftar</a>
+    </div>
+    <div style="text-align: center; margin-top: var(--space-2);">
+      <a href="index.html" style="color: var(--text-tertiary); text-decoration: none; font-size: var(--text-sm);">
+        <i class="fas fa-arrow-left"></i> Kembali ke Aplikasi
+      </a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if (!email || !password) {
+        alert('Email dan password harus diisi!');
+        return;
+      }
+      // Simulasi login sukses
+      alert('Login berhasil (simulasi). Arahkan ke dashboard.');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

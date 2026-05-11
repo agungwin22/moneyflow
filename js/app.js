@@ -146,15 +146,7 @@ function closeDropdown() {
   elements.dropdownMenu.classList.remove('show');
 }
 
-function handleLogin() {
-  closeDropdown();
-  alert('Fitur Login akan segera hadir!');
-}
 
-function handleRegister() {
-  closeDropdown();
-  alert('Fitur Register akan segera hadir!');
-}
 
 // ===== Event Delegation untuk tombol edit/hapus di tabel =====
 elements.tableBody.addEventListener('click', (e) => {
@@ -195,13 +187,12 @@ if (elements.profileBtn) {
   elements.profileBtn.addEventListener('click', toggleDropdown);
 }
 
-if (elements.loginBtn) {
-  elements.loginBtn.addEventListener('click', handleLogin);
-}
-
-if (elements.registerBtn) {
-  elements.registerBtn.addEventListener('click', handleRegister);
-}
+// Tutup dropdown saat link dropdown diklik (sebelum navigasi)
+document.querySelectorAll('.dropdown-item').forEach(item => {
+  item.addEventListener('click', () => {
+    closeDropdown();
+  });
+});
 
 // Tutup dropdown jika klik di luar area dropdown
 window.addEventListener('click', (e) => {
