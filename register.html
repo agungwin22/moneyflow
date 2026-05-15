@@ -12,6 +12,9 @@
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- link supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body style="background-color: var(--bg-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--space-4);">
   <div class="form-card" style="max-width: 400px; width: 100%; margin: 0;">
@@ -54,29 +57,50 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+    import { showNotification } from './js/utils.js';
+
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const fullname = document.getElementById('fullname').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const confirm = document.getElementById('confirmPassword').value;
 
       if (!fullname || !email || !password || !confirm) {
-        alert('Semua field harus diisi!');
+        showNotification('Semua field harus diisi!', 'error');
         return;
       }
       if (password !== confirm) {
-        alert('Password dan konfirmasi password tidak cocok!');
+        showNotification('Password dan konfirmasi tidak cocok', 'error');
         return;
       }
       if (password.length < 6) {
-        alert('Password minimal 6 karakter!');
+        showNotification('Password minimal 6 karakter', 'error');
         return;
       }
-      // Simulasi registrasi sukses
-      alert('Registrasi berhasil (simulasi). Silakan login.');
-      window.location.href = 'login.html';
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullname } }
+        });
+
+        if (error) {
+          showNotification('Registrasi gagal: ' + error.message, 'error');
+          console.error(error);
+        } else {
+          showNotification('Registrasi berhasil! Mengalihkan ke halaman login...', 'success');
+          window.location.href = 'login.html';
+        }
+      } catch (err) {
+        showNotification('Terjadi kesalahan: ' + err.message, 'error');
+        console.error(err);
+      }
     });
   </script>
 </body>

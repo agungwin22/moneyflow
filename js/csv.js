@@ -1,5 +1,5 @@
 // csv.js - Import dan Export CSV
-import { generateId, isValidTransaction } from './utils.js';
+import { generateId, isValidTransaction, showNotification } from './utils.js';
 
 /**
  * Export transaksi ke file CSV
@@ -7,7 +7,7 @@ import { generateId, isValidTransaction } from './utils.js';
  */
 export function exportToCSV(transactions) {
   if (transactions.length === 0) {
-    alert('Tidak ada data untuk di-export.');
+    showNotification('Tidak ada data untuk di-export.', 'error');
     return;
   }
   let csvContent = "Tanggal,Deskripsi,Pemasukan,Pengeluaran\n";
@@ -41,13 +41,13 @@ export function importFromCSV(file, callback) {
     const text = e.target.result;
     const lines = text.split('\n').filter(line => line.trim() !== '');
     if (lines.length < 2) {
-      alert('File CSV tidak valid atau kosong.');
+      showNotification('File CSV tidak valid atau kosong.', 'error');
       return;
     }
 
     const header = lines[0].split(',').map(h => h.trim());
     if (header[0] !== 'Tanggal' || header[1] !== 'Deskripsi' || header[2] !== 'Pemasukan' || header[3] !== 'Pengeluaran') {
-      alert('Format CSV harus memiliki header: Tanggal,Deskripsi,Pemasukan,Pengeluaran');
+      showNotification('Format CSV harus memiliki header: Tanggal,Deskripsi,Pemasukan,Pengeluaran', 'error');
       return;
     }
 
@@ -77,7 +77,7 @@ export function importFromCSV(file, callback) {
     if (berhasil > 0) {
       callback(dataBaru, berhasil);
     } else {
-      alert('Tidak ada data valid yang diimpor.');
+      showNotification('Tidak ada data valid yang diimpor.', 'error');
     }
   };
   reader.readAsText(file);

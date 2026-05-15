@@ -1,9 +1,9 @@
-// app.js - Entry point
-import { loadTransactions, saveTransactions } from './storage.js';
-import { addTransaction, updateTransaction, deleteTransaction } from './transaction.js';
+// app.js - Entry point dengan proteksi halaman
+import { supabase } from './supabase.js';
+import { loadTransactions, addTransaction as addTransactionDB, updateTransaction as updateTransactionDB, deleteTransaction as deleteTransactionDB } from './database.js';
 import { initUI, renderTable, showEditModal, hideEditModal, resetFormTambah } from './ui.js';
 import { exportToCSV, importFromCSV } from './csv.js';
-import { isValidTransaction, generateId } from './utils.js';
+import { isValidTransaction, showNotification } from './utils.js';
 
 // ===== State =====
 let transactions = [];
@@ -30,25 +30,56 @@ const elements = {
   btnExport: document.getElementById('btn-export'),
   btnReset: document.getElementById('btn-reset'),
   fileImport: document.getElementById('file-import'),
-  // Elemen baru untuk profil dropdown
   profileBtn: document.getElementById('profile-btn'),
-  dropdownMenu: document.getElementById('dropdown-menu'),
-  loginBtn: document.getElementById('login-btn'),
-  registerBtn: document.getElementById('register-btn')
+  dropdownMenu: document.getElementById('dropdown-menu')
 };
 
 // ===== Inisialisasi UI =====
 initUI(elements);
 
-// ===== Fungsi pembantu =====
-function updateAndRender(newTransactions) {
-  transactions = newTransactions;
-  saveTransactions(transactions);
+// ===== Fungsi Refresh =====
+async function refreshTransactions() {
+  transactions = await loadTransactions();
   renderTable(transactions);
 }
 
+// ===== UPDATE DROPDOWN DENGAN INFO USER & LOGOUT =====
+function updateDropdownForUser(user) {
+  if (!elements.dropdownMenu) return;
+  const fullName = user.user_metadata?.full_name || user.email || 'User';
+  elements.dropdownMenu.innerHTML = `
+    <div class="dropdown-item user-info" style="border-bottom: 1px solid var(--border-color); opacity:0.8; cursor:default;">
+      <i class="fas fa-user-circle"></i> ${fullName}
+    </div>
+    <button class="dropdown-item" id="logout-btn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  `;
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      showNotification('Anda telah logout.', 'info');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1000);
+    });
+  }
+}
+
+// ===== PROTEKSI HALAMAN =====
+async function protectPage() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return false;
+  }
+  updateDropdownForUser(session.user);
+  return true;
+}
+
 // ===== Event Handlers untuk Transaksi =====
-function handleTambah(e) {
+async function handleTambah(e) {
   e.preventDefault();
   const tanggal = elements.inputTanggal.value.trim();
   const deskripsi = elements.inputDeskripsi.value.trim();
@@ -56,30 +87,34 @@ function handleTambah(e) {
   const pengeluaran = Number(elements.inputPengeluaran.value) || 0;
 
   if (!tanggal || !deskripsi) {
-    alert('Tanggal dan deskripsi harus diisi!');
+    showNotification('Tanggal dan deskripsi harus diisi!', 'error');
     return;
   }
   if (!isValidTransaction(pemasukan, pengeluaran)) {
-    alert('Salah satu dari Pemasukan atau Pengeluaran harus lebih dari 0!');
+    showNotification('Salah satu dari Pemasukan atau Pengeluaran harus lebih dari 0!', 'error');
     return;
   }
 
-  const newTrx = {
-    id: generateId(),
-    tanggal,
-    deskripsi,
-    pemasukan,
-    pengeluaran
-  };
-  const updated = addTransaction(transactions, newTrx);
-  updateAndRender(updated);
-  resetFormTambah();
+  const newTrx = { tanggal, deskripsi, pemasukan, pengeluaran };
+  const added = await addTransactionDB(newTrx);
+  if (added) {
+    await refreshTransactions();
+    resetFormTambah();
+    showNotification('Transaksi berhasil ditambahkan!', 'success');
+  } else {
+    showNotification('Gagal menambahkan transaksi.', 'error');
+  }
 }
 
-function handleDelete(id) {
+async function handleDelete(id) {
   if (confirm('Yakin ingin menghapus transaksi ini?')) {
-    const updated = deleteTransaction(transactions, id);
-    updateAndRender(updated);
+    const success = await deleteTransactionDB(id);
+    if (success) {
+      await refreshTransactions();
+      showNotification('Transaksi berhasil dihapus!', 'success');
+    } else {
+      showNotification('Gagal menghapus transaksi.', 'error');
+    }
   }
 }
 
@@ -88,7 +123,7 @@ function handleEdit(id) {
   if (trx) showEditModal(trx);
 }
 
-function handleSimpanEdit(e) {
+async function handleSimpanEdit(e) {
   e.preventDefault();
   const id = elements.editId.value;
   const tanggal = elements.editTanggal.value;
@@ -97,40 +132,69 @@ function handleSimpanEdit(e) {
   const pengeluaran = Number(elements.editPengeluaran.value) || 0;
 
   if (!tanggal || !deskripsi) {
-    alert('Tanggal dan deskripsi harus diisi!');
+    showNotification('Tanggal dan deskripsi harus diisi!', 'error');
     return;
   }
   if (!isValidTransaction(pemasukan, pengeluaran)) {
-    alert('Salah satu dari Pemasukan atau Pengeluaran harus lebih dari 0!');
+    showNotification('Salah satu dari Pemasukan atau Pengeluaran harus lebih dari 0!', 'error');
     return;
   }
 
-  const updated = updateTransaction(transactions, id, { tanggal, deskripsi, pemasukan, pengeluaran });
-  updateAndRender(updated);
-  hideEditModal();
+  const updated = await updateTransactionDB(id, { tanggal, deskripsi, pemasukan, pengeluaran });
+  if (updated) {
+    await refreshTransactions();
+    hideEditModal();
+    showNotification('Transaksi berhasil diperbarui!', 'success');
+  } else {
+    showNotification('Gagal memperbarui transaksi.', 'error');
+  }
 }
 
-function handleReset() {
+async function handleReset() {
   if (confirm('Reset data? Semua transaksi akan dihapus permanen.')) {
-    updateAndRender([]);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('user_id', session.user.id);
+      if (!error) {
+        await refreshTransactions();
+        showNotification('Semua data berhasil direset', 'info');
+      } else {
+        showNotification('Gagal mereset data.', 'error');
+      }
+    }
   }
 }
 
 function handleExport() {
+  if (transactions.length === 0) {
+    showNotification('Tidak ada data untuk di-export.', 'error');
+    return;
+  }
   exportToCSV(transactions);
+  showNotification('Data berhasil diekspor!', 'success');
 }
 
 function handleImport() {
   elements.fileImport.click();
 }
 
-function handleFileChange(e) {
+async function handleFileChange(e) {
   const file = e.target.files[0];
   if (file) {
-    importFromCSV(file, (dataBaru, berhasil) => {
-      const updated = [...transactions, ...dataBaru];
-      updateAndRender(updated);
-      alert(`${berhasil} data berhasil diimpor.`);
+    importFromCSV(file, async (dataBaru, berhasil) => {
+      for (const item of dataBaru) {
+        await addTransactionDB({
+          tanggal: item.tanggal,
+          deskripsi: item.deskripsi,
+          pemasukan: item.pemasukan,
+          pengeluaran: item.pengeluaran
+        });
+      }
+      await refreshTransactions();
+      showNotification(`${berhasil} data berhasil diimpor.`, 'success');
     });
   }
   elements.fileImport.value = '';
@@ -139,36 +203,35 @@ function handleFileChange(e) {
 // ===== HANDLER UNTUK PROFIL DROPDOWN =====
 function toggleDropdown(e) {
   e.stopPropagation();
-  elements.dropdownMenu.classList.toggle('show');
+  if (elements.dropdownMenu) elements.dropdownMenu.classList.toggle('show');
 }
 
 function closeDropdown() {
-  elements.dropdownMenu.classList.remove('show');
+  if (elements.dropdownMenu) elements.dropdownMenu.classList.remove('show');
 }
 
-
-
 // ===== Event Delegation untuk tombol edit/hapus di tabel =====
-elements.tableBody.addEventListener('click', (e) => {
-  const btnEdit = e.target.closest('.btn-icon-edit');
-  if (btnEdit) {
-    const id = btnEdit.dataset.id;
-    handleEdit(id);
-    return;
-  }
-  const btnDelete = e.target.closest('.btn-icon-delete');
-  if (btnDelete) {
-    const id = btnDelete.dataset.id;
-    handleDelete(id);
-  }
-});
+if (elements.tableBody) {
+  elements.tableBody.addEventListener('click', (e) => {
+    const btnEdit = e.target.closest('.btn-icon-edit');
+    if (btnEdit) {
+      const id = btnEdit.dataset.id;
+      handleEdit(id);
+      return;
+    }
+    const btnDelete = e.target.closest('.btn-icon-delete');
+    if (btnDelete) {
+      const id = btnDelete.dataset.id;
+      handleDelete(id);
+    }
+  });
+}
 
 // ===== Daftarkan Event Listener =====
-elements.btnTambah.addEventListener('click', handleTambah);
-
-elements.btnCloseModal.addEventListener('click', hideEditModal);
-elements.btnCancelEdit.addEventListener('click', hideEditModal);
-elements.formEdit.addEventListener('submit', handleSimpanEdit);
+if (elements.btnTambah) elements.btnTambah.addEventListener('click', handleTambah);
+if (elements.btnCloseModal) elements.btnCloseModal.addEventListener('click', hideEditModal);
+if (elements.btnCancelEdit) elements.btnCancelEdit.addEventListener('click', hideEditModal);
+if (elements.formEdit) elements.formEdit.addEventListener('submit', handleSimpanEdit);
 
 // Klik di luar modal untuk menutup
 window.addEventListener('click', (e) => {
@@ -177,22 +240,15 @@ window.addEventListener('click', (e) => {
   }
 });
 
-elements.btnExport.addEventListener('click', handleExport);
-elements.btnImport.addEventListener('click', handleImport);
-elements.fileImport.addEventListener('change', handleFileChange);
-elements.btnReset.addEventListener('click', handleReset);
+if (elements.btnExport) elements.btnExport.addEventListener('click', handleExport);
+if (elements.btnImport) elements.btnImport.addEventListener('click', handleImport);
+if (elements.fileImport) elements.fileImport.addEventListener('change', handleFileChange);
+if (elements.btnReset) elements.btnReset.addEventListener('click', handleReset);
 
 // ===== Event Listener untuk Profil Dropdown =====
 if (elements.profileBtn) {
   elements.profileBtn.addEventListener('click', toggleDropdown);
 }
-
-// Tutup dropdown saat link dropdown diklik (sebelum navigasi)
-document.querySelectorAll('.dropdown-item').forEach(item => {
-  item.addEventListener('click', () => {
-    closeDropdown();
-  });
-});
 
 // Tutup dropdown jika klik di luar area dropdown
 window.addEventListener('click', (e) => {
@@ -202,6 +258,10 @@ window.addEventListener('click', (e) => {
   }
 });
 
-// ===== Inisialisasi Awal =====
-transactions = loadTransactions();
-renderTable(transactions);
+// ===== Inisialisasi Utama dengan Proteksi =====
+(async () => {
+  const isLoggedIn = await protectPage();
+  if (isLoggedIn) {
+    await refreshTransactions();
+  }
+})();
